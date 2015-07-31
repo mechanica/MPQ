@@ -1,4 +1,3 @@
-#define BUILDING_NODE_EXTENSION
 #ifndef MPQTFILE_H
 #define MPQTFILE_H
 

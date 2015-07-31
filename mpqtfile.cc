@@ -1,4 +1,3 @@
-#define BUILDING_NODE_EXTENSION
 #include <node.h>
 #include <node_buffer.h>
 #include "mpqtfile.h"
@@ -55,7 +54,7 @@ Handle<Value> MPQTFile::NewInstance(HANDLE hFile) {
 
   MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(instance);
   obj->hFile = hFile;
-  
+
   return scope.Close(instance);
 }
 
@@ -89,7 +88,7 @@ Handle<Value> MPQTFile::Write(const Arguments& args) {
   char *buffer = node::Buffer::Data( args[0]->ToObject() );
 
   SFileWriteFile( obj->hFile, buffer, (DWORD)filesize, NULL );
-  
+
   return scope.Close( args.This() );
 }
 
