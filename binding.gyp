@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "mpqtools",
+      "target_name": "mech_mpq",
       "sources": [
         "src/mpqtools.cc",
         "src/mpqtarchive.cc",

@@ -47,4 +47,4 @@ void InitAll(Handle<Object> target) {
 
 }
 
-NODE_MODULE(mpqtools, InitAll)
+NODE_MODULE(mech_mpq, InitAll)
