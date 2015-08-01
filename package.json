@@ -27,7 +27,7 @@
       "email": "shyamguth@gmail.com"
     }
   ],
-  "license": "BSD",
+  "license": "MIT",
   "gypfile": true,
   "dependencies": {
     "nan": "~1.3.0"
