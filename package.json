@@ -17,6 +17,13 @@
     "native"
   ],
   "author": "Kirill Enykeev <enykeev@gmail.com>",
+  "contributors": [
+    {
+      "name": "Shyam Guthikonda",
+      "url": "http://shy.am",
+      "email": "shyamguth@gmail.com"
+    }
+  ],
   "license": "BSD",
   "gypfile": true,
   "dependencies": {
