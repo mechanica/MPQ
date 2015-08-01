@@ -1,8 +1,8 @@
 {
   "name": "mech-mpq",
   "version": "0.0.1",
-  "description": "StormLib MPQ wrapper",
-  "main": "build/Release/mpqtools",
+  "description": "A StormLib MPQ wrapper.",
+  "main": "build/Release/mech_mpq",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "make"
@@ -11,12 +11,22 @@
     "type": "git",
     "url": "https://github.com/mechanica/MPQ"
   },
+  "bugs": {
+    "url": "https://github.com/mechanica/MPQ/issues"
+  },
   "keywords": [
     "mpq",
     "stormlib",
     "native"
   ],
   "author": "Kirill Enykeev <enykeev@gmail.com>",
+  "contributors": [
+    {
+      "name": "Shyam Guthikonda",
+      "url": "http://shy.am",
+      "email": "shyamguth@gmail.com"
+    }
+  ],
   "license": "BSD",
   "gypfile": true,
   "dependencies": {

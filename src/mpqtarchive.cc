@@ -85,7 +85,7 @@ NAN_METHOD(MPQTArchive::EnumLocales) {
 
   String::Utf8Value filename(args[0]);
 
-  SFileEnumLocales( obj->hArchive, *filename, locales, &maxLocales, NULL );
+  SFileEnumLocales( obj->hArchive, *filename, locales, &maxLocales, 0 );
 
   Local<Array> array = NanNew<Array>(maxLocales);
 
@@ -105,7 +105,7 @@ NAN_METHOD(MPQTArchive::Create) {
   String::Utf8Value filename(args[0]);
   String::Utf8Value size(args[1]);
 
-  if (!SFileCreateFile( obj->hArchive, *filename, 0, atoi( *size ), 0, NULL, &hFile ))
+  if (!SFileCreateFile( obj->hArchive, *filename, 0, atoi( *size ), 0, 0x0, &hFile ))
   {
     NanThrowError("Unable to create a file");
     NanReturnUndefined();
@@ -120,7 +120,7 @@ NAN_METHOD(MPQTArchive::Remove) {
 
   String::Utf8Value filename(args[0]);
 
-  if (!SFileRemoveFile( obj->hArchive, *filename, NULL ))
+  if (!SFileRemoveFile( obj->hArchive, *filename, 0 ))
   {
     NanThrowError("Unable to remove a file");
     NanReturnUndefined();

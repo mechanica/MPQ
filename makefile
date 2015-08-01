@@ -1,4 +1,4 @@
-STORM=StormLib
+STORM=src/StormLib
 
 .PHONY: all stormlib clean clean-stormlib
 
