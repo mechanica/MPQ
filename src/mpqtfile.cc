@@ -80,7 +80,7 @@ NAN_METHOD(MPQTFile::Write) {
   DWORD filesize = SFileGetFileSize( obj->hFile, NULL );
   char *buffer = node::Buffer::Data( args[0]->ToObject() );
 
-  SFileWriteFile( obj->hFile, buffer, (DWORD)filesize, NULL );
+  SFileWriteFile( obj->hFile, buffer, (DWORD)filesize, 0x0 );
 
   NanReturnValue(args.This());
 }

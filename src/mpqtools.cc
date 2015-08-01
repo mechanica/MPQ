@@ -12,7 +12,7 @@ NAN_METHOD(OpenArchive) {
 
   String::Utf8Value filename(args[0]);
 
-  if (!SFileOpenArchive( *filename, 0, NULL, &hArchive ))
+  if (!SFileOpenArchive( *filename, 0, 0x0, &hArchive ))
   {
     fprintf(stderr, "%X", GetLastError());
     NanThrowError("Failed to open the file");
