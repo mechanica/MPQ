@@ -2,8 +2,8 @@
   "targets": [
     {
       "target_name": "mpqtools",
-      "sources": [ 
-      	"mpqtools.cc", 
+      "sources": [
+      	"mpqtools.cc",
         "mpqtarchive.cc",
         "mpqtfile.cc"
       ],
@@ -11,7 +11,10 @@
         "libraries": [
           "../StormLib/storm.framework/storm"
         ]
-      }
+      },
+      "include_dirs": [
+        "<!(node -e \"require('nan')\")"
+      ]
     }
   ]
 }

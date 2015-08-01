@@ -2,7 +2,6 @@
 #include "mpqtarchive.h"
 #include "mpqtfile.h"
 
-
 using namespace v8;
 
 MPQTArchive::MPQTArchive() {};
@@ -11,44 +10,45 @@ MPQTArchive::~MPQTArchive() {};
 Persistent<Function> MPQTArchive::constructor;
 
 void MPQTArchive::Init() {
-  Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
-  tpl->SetClassName(String::NewSymbol("MPQTArchive"));
+  Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(New);
+  tpl->SetClassName(NanNew("MPQTArchive"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("openFile"), FunctionTemplate::New(Open)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("hasFile"), FunctionTemplate::New(HasFile)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("enumLocales"), FunctionTemplate::New(EnumLocales)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("createFile"), FunctionTemplate::New(Create)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("removeFile"), FunctionTemplate::New(Remove)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("renameFile"), FunctionTemplate::New(Rename)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("flush"), FunctionTemplate::New(Flush)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("closeArchive"), FunctionTemplate::New(Close)->GetFunction());
+  tpl->PrototypeTemplate()->Set(NanNew("openFile"), NanNew<FunctionTemplate>(Open)->GetFunction());
+  tpl->PrototypeTemplate()->Set(NanNew("hasFile"), NanNew<FunctionTemplate>(HasFile)->GetFunction());
+  tpl->PrototypeTemplate()->Set(NanNew("enumLocales"), NanNew<FunctionTemplate>(EnumLocales)->GetFunction());
+  tpl->PrototypeTemplate()->Set(NanNew("createFile"), NanNew<FunctionTemplate>(Create)->GetFunction());
+  tpl->PrototypeTemplate()->Set(NanNew("removeFile"), NanNew<FunctionTemplate>(Remove)->GetFunction());
+  tpl->PrototypeTemplate()->Set(NanNew("renameFile"), NanNew<FunctionTemplate>(Rename)->GetFunction());
+  tpl->PrototypeTemplate()->Set(NanNew("flush"), NanNew<FunctionTemplate>(Flush)->GetFunction());
+  tpl->PrototypeTemplate()->Set(NanNew("closeArchive"), NanNew<FunctionTemplate>(Close)->GetFunction());
 
-  constructor = Persistent<Function>::New(tpl->GetFunction());
+  NanAssignPersistent(constructor, tpl->GetFunction());
 }
 
-Handle<Value> MPQTArchive::New(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::New) {
+  NanScope();
 
   MPQTArchive* obj = new MPQTArchive();
   obj->Wrap(args.This());
 
-  return args.This();
+  NanReturnValue(args.This());
 }
 
 Handle<Value> MPQTArchive::NewInstance(HANDLE hArchive) {
-  HandleScope scope;
+  NanEscapableScope();
 
-  Local<Object> instance = constructor->NewInstance();
+  Local<Function> cons = NanNew<Function>(constructor);
+  Local<Object> instance = cons->NewInstance();
 
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(instance);
   obj->hArchive = hArchive;
 
-  return scope.Close(instance);
+  return NanEscapeScope(instance);
 }
 
-Handle<Value> MPQTArchive::Open(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::Open) {
+  NanScope();
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(args.This());
 
   HANDLE hFile;
@@ -58,26 +58,26 @@ Handle<Value> MPQTArchive::Open(const Arguments& args) {
   if (!SFileOpenFileEx( obj->hArchive, *str, SFILE_OPEN_FROM_MPQ, &hFile ))
   {
     fprintf(stderr, "%d", GetLastError());
-    ThrowException(Exception::TypeError(String::New("There is no such file")));
-    return scope.Close(Undefined());
+    NanThrowError("There is no such file");
+    NanReturnUndefined();
   }
 
-  return scope.Close(MPQTFile::NewInstance(hFile));
+  NanReturnValue(MPQTFile::NewInstance(hFile));
 }
 
-Handle<Value> MPQTArchive::HasFile(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::HasFile) {
+  NanScope();
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(args.This());
 
   String::Utf8Value filename(args[0]);
 
   bool is = SFileHasFile( obj->hArchive, *filename );
 
-  return scope.Close( Boolean::New(is) );
+  NanReturnValue(NanNew<Boolean>(is));
 }
 
-Handle<Value> MPQTArchive::EnumLocales(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::EnumLocales) {
+  NanScope();
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(args.This());
 
   DWORD maxLocales = 10;
@@ -87,17 +87,17 @@ Handle<Value> MPQTArchive::EnumLocales(const Arguments& args) {
 
   SFileEnumLocales( obj->hArchive, *filename, locales, &maxLocales, NULL );
 
-  Local<Array> array = Array::New(maxLocales);
+  Local<Array> array = NanNew<Array>(maxLocales);
 
   for (int index = 0; index<(int)maxLocales; index++) {
-    array->Set(Integer::New(index), Integer::New( locales[index] ));
+    array->Set(NanNew<Integer>(index), NanNew<Integer>( locales[index] ));
   }
 
-  return scope.Close( array );
+  NanReturnValue(array);
 }
 
-Handle<Value> MPQTArchive::Create(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::Create) {
+  NanScope();
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(args.This());
 
   HANDLE hFile;
@@ -107,30 +107,30 @@ Handle<Value> MPQTArchive::Create(const Arguments& args) {
 
   if (!SFileCreateFile( obj->hArchive, *filename, 0, atoi( *size ), 0, NULL, &hFile ))
   {
-    ThrowException(Exception::TypeError(String::New("Unable to create a file")));
-    return scope.Close(Undefined());
+    NanThrowError("Unable to create a file");
+    NanReturnUndefined();
   }
 
-  return scope.Close(MPQTFile::NewInstance(hFile));
+  NanReturnValue(MPQTFile::NewInstance(hFile));
 }
 
-Handle<Value> MPQTArchive::Remove(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::Remove) {
+  NanScope();
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(args.This());
 
   String::Utf8Value filename(args[0]);
 
   if (!SFileRemoveFile( obj->hArchive, *filename, NULL ))
   {
-    ThrowException(Exception::TypeError(String::New("Unable to remove a file")));
-    return scope.Close(Undefined());
+    NanThrowError("Unable to remove a file");
+    NanReturnUndefined();
   }
 
-  return scope.Close( args.This() );
+  NanReturnValue(args.This());
 }
 
-Handle<Value> MPQTArchive::Rename(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::Rename) {
+  NanScope();
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(args.This());
 
   String::Utf8Value filename(args[0]);
@@ -138,15 +138,15 @@ Handle<Value> MPQTArchive::Rename(const Arguments& args) {
 
   if (!SFileRenameFile( obj->hArchive, *filename, *newFilename ))
   {
-    ThrowException(Exception::TypeError(String::New("Unable to rename a file")));
-    return scope.Close(Undefined());
+    NanThrowError("Unable to rename a file");
+    NanReturnUndefined();
   }
 
-  return scope.Close( args.This() );
+  NanReturnValue(args.This());
 }
 
-Handle<Value> MPQTArchive::Flush(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::Flush) {
+  NanScope();
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(args.This());
 
   String::Utf8Value filename(args[0]);
@@ -154,18 +154,18 @@ Handle<Value> MPQTArchive::Flush(const Arguments& args) {
 
   if (!SFileFlushArchive( obj->hArchive ))
   {
-    ThrowException(Exception::TypeError(String::New("Unable to flush")));
-    return scope.Close(Undefined());
+    NanThrowError("Unable to flush");
+    NanReturnUndefined();
   }
 
-  return scope.Close( args.This() );
+  NanReturnValue(args.This());
 }
 
-Handle<Value> MPQTArchive::Close(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MPQTArchive::Close) {
+  NanScope();
   MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(args.This());
 
   SFileCloseArchive( obj->hArchive );
 
-  return scope.Close( args.This() );
+  NanReturnValue(args.This());
 }
