@@ -3,13 +3,13 @@
     {
       "target_name": "mpqtools",
       "sources": [
-      	"mpqtools.cc",
-        "mpqtarchive.cc",
-        "mpqtfile.cc"
+        "src/mpqtools.cc",
+        "src/mpqtarchive.cc",
+        "src/mpqtfile.cc"
       ],
       "link_settings": {
         "libraries": [
-          "../StormLib/storm.framework/storm"
+          "../src/StormLib/storm.framework/storm"
         ]
       },
       "include_dirs": [
