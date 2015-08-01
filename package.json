@@ -1,6 +1,6 @@
 {
   "name": "mech-mpq",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A StormLib MPQ wrapper.",
   "main": "build/Release/mech_mpq",
   "scripts": {
