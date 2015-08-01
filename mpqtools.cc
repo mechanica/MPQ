@@ -1,12 +1,12 @@
-#define BUILDING_NODE_EXTENSION
 #include <node.h>
+#include <nan.h>
 #include "mpqtarchive.h"
 #include "mpqtfile.h"
 
 using namespace v8;
 
-Handle<Value> OpenArchive(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(OpenArchive) {
+  NanScope();
 
   HANDLE hArchive;
 
@@ -14,16 +14,16 @@ Handle<Value> OpenArchive(const Arguments& args) {
 
   if (!SFileOpenArchive( *filename, 0, NULL, &hArchive ))
   {
-  	fprintf(stderr, "%X", GetLastError());
-    ThrowException(Exception::TypeError(String::New("Failed to open the file")));
-    return scope.Close(Undefined());
+    fprintf(stderr, "%X", GetLastError());
+    NanThrowError("Failed to open the file");
+    NanReturnUndefined();
   }
 
-  return scope.Close(MPQTArchive::NewInstance(hArchive));
+  NanReturnValue(MPQTArchive::NewInstance(hArchive));
 }
 
-Handle<Value> CreateArchive(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(CreateArchive) {
+  NanScope();
 
   HANDLE hArchive;
 
@@ -31,19 +31,19 @@ Handle<Value> CreateArchive(const Arguments& args) {
 
   if (!SFileCreateArchive( *filename, MPQ_CREATE_ARCHIVE_V2, 10, &hArchive ))
   {
-    ThrowException(Exception::TypeError(String::New("Failed to create the file")));
-    return scope.Close(Undefined());
+    NanThrowError("Failed to create the file");
+    NanReturnUndefined();
   }
 
-  return scope.Close(MPQTArchive::NewInstance(hArchive));
+  NanReturnValue(MPQTArchive::NewInstance(hArchive));
 }
 
 void InitAll(Handle<Object> target) {
   MPQTArchive::Init();
   MPQTFile::Init();
 
-  target->Set(String::NewSymbol("openArchive"), FunctionTemplate::New(OpenArchive)->GetFunction());
-  target->Set(String::NewSymbol("createArchive"), FunctionTemplate::New(CreateArchive)->GetFunction());
+  target->Set(NanNew("openArchive"), NanNew<FunctionTemplate>(OpenArchive)->GetFunction());
+  target->Set(NanNew("createArchive"), NanNew<FunctionTemplate>(CreateArchive)->GetFunction());
 
 }
 

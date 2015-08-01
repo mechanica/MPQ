@@ -1,8 +1,8 @@
-#define BUILDING_NODE_EXTENSION
 #ifndef MPQTARCHIVE_H
 #define MPQTARCHIVE_H
 
 #include <node.h>
+#include <nan.h>
 #include "Stormlib/src/StormLib.h"
 
 class MPQTArchive : public node::ObjectWrap {
@@ -15,15 +15,15 @@ class MPQTArchive : public node::ObjectWrap {
   ~MPQTArchive();
 
   static v8::Persistent<v8::Function> constructor;
-  static v8::Handle<v8::Value> New(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Open(const v8::Arguments& args);
-  static v8::Handle<v8::Value> HasFile(const v8::Arguments& args);
-  static v8::Handle<v8::Value> EnumLocales(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Create(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Remove(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Rename(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Flush(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Close(const v8::Arguments& args);
+  static NAN_METHOD(New);
+  static NAN_METHOD(Open);
+  static NAN_METHOD(HasFile);
+  static NAN_METHOD(EnumLocales);
+  static NAN_METHOD(Create);
+  static NAN_METHOD(Remove);
+  static NAN_METHOD(Rename);
+  static NAN_METHOD(Flush);
+  static NAN_METHOD(Close);
   HANDLE hArchive;
 };
 

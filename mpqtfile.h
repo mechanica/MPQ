@@ -1,8 +1,9 @@
-#define BUILDING_NODE_EXTENSION
 #ifndef MPQTFILE_H
 #define MPQTFILE_H
 
 #include <node.h>
+#include <node_object_wrap.h>
+#include <nan.h>
 #include "Stormlib/src/StormLib.h"
 
 class MPQTFile : public node::ObjectWrap {
@@ -15,12 +16,12 @@ class MPQTFile : public node::ObjectWrap {
   ~MPQTFile();
 
   static v8::Persistent<v8::Function> constructor;
-  static v8::Handle<v8::Value> New(const v8::Arguments& args);
-  static v8::Handle<v8::Value> GetFileSize(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Read(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Write(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Finish(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Close(const v8::Arguments& args);
+  static NAN_METHOD(New);
+  static NAN_METHOD(GetFileSize);
+  static NAN_METHOD(Read);
+  static NAN_METHOD(Write);
+  static NAN_METHOD(Finish);
+  static NAN_METHOD(Close);
 
   HANDLE hFile;
 };
