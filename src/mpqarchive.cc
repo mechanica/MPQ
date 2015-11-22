@@ -1,5 +1,5 @@
-#include "mpqtarchive.h"
-#include "mpqtfile.h"
+#include "mpqarchive.h"
+#include "mpqfile.h"
 #include "utils.h"
 
 using v8::Function;
@@ -9,12 +9,12 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 
-Nan::Persistent<Function> MPQTArchive::constructor;
+Nan::Persistent<Function> MPQArchive::constructor;
 
-void MPQTArchive::Init() {
+void MPQArchive::Init() {
   Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
 
-  tpl->SetClassName(Nan::New("MPQTArchive").ToLocalChecked());
+  tpl->SetClassName(Nan::New("MPQArchive").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
   Nan::SetPrototypeMethod(tpl, "openFile", OpenFile);
@@ -28,48 +28,48 @@ void MPQTArchive::Init() {
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-Local<Value> MPQTArchive::NewInstance(HANDLE handle) {
+Local<Value> MPQArchive::NewInstance(HANDLE handle) {
   Local<Function> cons = Nan::New(constructor);
   Local<Object> instance = cons->NewInstance();
 
-  MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(instance);
+  MPQArchive* obj = ObjectWrap::Unwrap<MPQArchive>(instance);
   obj->_handle = handle;
 
   return instance;
 }
 
-MPQTArchive::MPQTArchive()
+MPQArchive::MPQArchive()
   :_handle(NULL) {
 
 }
 
-NAN_METHOD(MPQTArchive::New) {
-  MPQTArchive* obj = new MPQTArchive();
+NAN_METHOD(MPQArchive::New) {
+  MPQArchive* obj = new MPQArchive();
   obj->Wrap(info.This());
   info.GetReturnValue().Set(info.This());
 }
 
-NAN_METHOD(MPQTArchive::OpenFile) {
+NAN_METHOD(MPQArchive::OpenFile) {
   if (info.Length() != 1 || !info[0]->IsString()) {
-    LOG_ERROR("MPQTArchive::OpenFile - incorrect parameters.");
+    LOG_ERROR("MPQArchive::OpenFile - incorrect parameters.");
   } else {
-    MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(info.This());
+    MPQArchive* obj = ObjectWrap::Unwrap<MPQArchive>(info.This());
     String::Utf8Value filename(info[0]);
 
     HANDLE fileHandle;
     if (SFileOpenFileEx(obj->_handle, *filename, SFILE_OPEN_FROM_MPQ, &fileHandle)) {
-      return info.GetReturnValue().Set(MPQTFile::NewInstance(fileHandle));
+      return info.GetReturnValue().Set(MPQFile::NewInstance(fileHandle));
     }
   }
 }
 
-NAN_METHOD(MPQTArchive::HasFile) {
+NAN_METHOD(MPQArchive::HasFile) {
   bool result = false;
 
   if (info.Length() != 1 || !info[0]->IsString()) {
-    LOG_ERROR("MPQTArchive::HasFile - incorrect parameters.");
+    LOG_ERROR("MPQArchive::HasFile - incorrect parameters.");
   } else {
-    MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(info.This());
+    MPQArchive* obj = ObjectWrap::Unwrap<MPQArchive>(info.This());
     String::Utf8Value filename(info[0]);
     result = SFileHasFile(obj->_handle, *filename);
   }
@@ -77,28 +77,28 @@ NAN_METHOD(MPQTArchive::HasFile) {
   info.GetReturnValue().Set(result);
 }
 
-NAN_METHOD(MPQTArchive::CreateFile) {
+NAN_METHOD(MPQArchive::CreateFile) {
   if (info.Length() != 2 || !info[0]->IsString() || !info[1]->IsNumber()) {
-    LOG_ERROR("MPQTArchive::CreateFile - incorrect parameters.");
+    LOG_ERROR("MPQArchive::CreateFile - incorrect parameters.");
   } else {
-    MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(info.This());
+    MPQArchive* obj = ObjectWrap::Unwrap<MPQArchive>(info.This());
     String::Utf8Value filename(info[0]);
     int size = info[1]->NumberValue();
 
     HANDLE fileHandle;
     if (SFileCreateFile(obj->_handle, *filename, 0, size, 0, 0x0, &fileHandle)) {
-      return info.GetReturnValue().Set(MPQTFile::NewInstance(fileHandle));
+      return info.GetReturnValue().Set(MPQFile::NewInstance(fileHandle));
     }
   }
 }
 
-NAN_METHOD(MPQTArchive::RemoveFile) {
+NAN_METHOD(MPQArchive::RemoveFile) {
   bool result = false;
 
   if (info.Length() != 1 || !info[0]->IsString()) {
-    LOG_ERROR("MPQTArchive::RemoveFile - incorrect parameters.");
+    LOG_ERROR("MPQArchive::RemoveFile - incorrect parameters.");
   } else {
-    MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(info.This());
+    MPQArchive* obj = ObjectWrap::Unwrap<MPQArchive>(info.This());
     String::Utf8Value filename(info[0]);
     result = SFileRemoveFile(obj->_handle, *filename, 0);
   }
@@ -106,13 +106,13 @@ NAN_METHOD(MPQTArchive::RemoveFile) {
   return info.GetReturnValue().Set(result);
 }
 
-NAN_METHOD(MPQTArchive::RenameFile) {
+NAN_METHOD(MPQArchive::RenameFile) {
   bool result = false;
 
   if (info.Length() != 2 || !info[0]->IsString() || !info[1]->IsString()) {
-    LOG_ERROR("MPQTArchive::RenameFile - incorrect parameters.");
+    LOG_ERROR("MPQArchive::RenameFile - incorrect parameters.");
   } else {
-    MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(info.This());
+    MPQArchive* obj = ObjectWrap::Unwrap<MPQArchive>(info.This());
     String::Utf8Value filename(info[0]);
     String::Utf8Value newFilename(info[1]);
     result = SFileRenameFile(obj->_handle, *filename, *newFilename);
@@ -121,14 +121,14 @@ NAN_METHOD(MPQTArchive::RenameFile) {
   return info.GetReturnValue().Set(result);
 }
 
-NAN_METHOD(MPQTArchive::Flush) {
-  MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(info.This());
+NAN_METHOD(MPQArchive::Flush) {
+  MPQArchive* obj = ObjectWrap::Unwrap<MPQArchive>(info.This());
 
   bool result = SFileFlushArchive(obj->_handle);
   return info.GetReturnValue().Set(result);
 }
 
-NAN_METHOD(MPQTArchive::Close) {
-  MPQTArchive* obj = ObjectWrap::Unwrap<MPQTArchive>(info.This());
+NAN_METHOD(MPQArchive::Close) {
+  MPQArchive* obj = ObjectWrap::Unwrap<MPQArchive>(info.This());
   SFileCloseArchive(obj->_handle);
 }
