@@ -1,50 +1,54 @@
 #include <node.h>
 #include <nan.h>
-#include "mpqtarchive.h"
-#include "mpqtfile.h"
+#include "mpqarchive.h"
+#include "mpqfile.h"
+#include "utils.h"
 
-using namespace v8;
+using v8::FunctionTemplate;
+using v8::Local;
+using v8::String;
+using v8::Value;
 
 NAN_METHOD(OpenArchive) {
-  NanScope();
-
-  HANDLE hArchive;
-
-  String::Utf8Value filename(args[0]);
-
-  if (!SFileOpenArchive( *filename, 0, 0x0, &hArchive ))
-  {
-    fprintf(stderr, "%X", GetLastError());
-    NanThrowError("Failed to open the file");
-    NanReturnUndefined();
+  if (info.Length() != 1 || !info[0]->IsString()) {
+    LOG_ERROR("OpenArchive - incorrect parameters.");
+    return;
   }
 
-  NanReturnValue(MPQTArchive::NewInstance(hArchive));
+  HANDLE archiveHandle;
+  String::Utf8Value filename(info[0]);
+
+  if (!SFileOpenArchive(*filename, 0, 0x0, &archiveHandle)) {
+    return Nan::ThrowError("Failed to open the archive.");
+  }
+
+  info.GetReturnValue().Set(MPQArchive::NewInstance(archiveHandle));
 }
 
 NAN_METHOD(CreateArchive) {
-  NanScope();
-
-  HANDLE hArchive;
-
-  String::Utf8Value filename(args[0]);
-
-  if (!SFileCreateArchive( *filename, MPQ_CREATE_ARCHIVE_V2, 10, &hArchive ))
-  {
-    NanThrowError("Failed to create the file");
-    NanReturnUndefined();
+  if (info.Length() != 1 || !info[0]->IsString()) {
+    LOG_ERROR("CreateArchive - incorrect parameters.");
+    return;
   }
 
-  NanReturnValue(MPQTArchive::NewInstance(hArchive));
+  HANDLE archiveHandle;
+  String::Utf8Value filename(info[0]);
+
+  if (!SFileCreateArchive(*filename, MPQ_CREATE_ARCHIVE_V2, 10, &archiveHandle)) {
+    return Nan::ThrowError("Failed to create the archive.");
+  }
+
+  info.GetReturnValue().Set(MPQArchive::NewInstance(archiveHandle));
 }
 
-void InitAll(Handle<Object> target) {
-  MPQTArchive::Init();
-  MPQTFile::Init();
+NAN_MODULE_INIT(InitAll) {
+  MPQArchive::Init();
+  MPQFile::Init();
 
-  target->Set(NanNew("openArchive"), NanNew<FunctionTemplate>(OpenArchive)->GetFunction());
-  target->Set(NanNew("createArchive"), NanNew<FunctionTemplate>(CreateArchive)->GetFunction());
-
+  Nan::Set(target, Nan::New("openArchive").ToLocalChecked(),
+    Nan::GetFunction(Nan::New<FunctionTemplate>(OpenArchive)).ToLocalChecked());
+  Nan::Set(target, Nan::New("createArchive").ToLocalChecked(),
+    Nan::GetFunction(Nan::New<FunctionTemplate>(CreateArchive)).ToLocalChecked());
 }
 
 NODE_MODULE(mech_mpq, InitAll)
