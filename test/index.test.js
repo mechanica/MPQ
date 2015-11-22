@@ -94,6 +94,7 @@ describe('file operations', function() {
         var otherFile = archive.openFile(filePath);
         expect(otherFile).to.exist;
         expect(otherFile.getSize()).to.equal(fileSize);
+        otherFile.close();
 
         archive.close();
     });
@@ -115,7 +116,7 @@ describe('file operations', function() {
         var buffer = new Buffer(bytes);
         expect(buffer.length).to.equal(fileSize);
         expect(file.write(buffer)).to.be.true;
-        expect(file.finish()).to.be.true;
+        expect(file.close()).to.be.true;
 
         file = archive.openFile(filePath);
         expect(file).to.exist;
@@ -124,6 +125,7 @@ describe('file operations', function() {
         var otherBuffer = file.read();
         expect(otherBuffer).to.exist;
         expect(otherBuffer.length).to.equal(fileSize);
+        file.close();
 
         expect(bufferEqual(buffer, otherBuffer)).to.be.true;
 
