@@ -25,3 +25,14 @@ catch (err) {
     console.error(err);
 }
 ```
+
+## Dev
+### Compilation
+1. Clone:
+  * `git clone https://github.com/mechanica/MPQ.git`
+1. Checkout submodules:
+  * `git submodule init && git submodule update`
+1. Build:
+  * `npm install`
+1. Run tests:
+  * `npm test`
