@@ -6,8 +6,7 @@ A StormLib MPQ wrapper for Node.js.
 ## Installation
 `npm install mech-mpq`
 
-## Usage
-### Example
+## Example
 Open an MPQ archive and read a file:
 ```
 var mpq = require('mech-mpq');
