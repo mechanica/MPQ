@@ -4,7 +4,7 @@ mech-mpq
 A StormLib MPQ wrapper for Node.js.
 
 ## Installation
-`npm install mech-mpq`
+`npm install mech-mpq --save`
 
 ## Example
 Open an MPQ archive and read a file:
@@ -17,7 +17,7 @@ function getFileContents(mpqPath, filePath) {
         var file = archive.openFile(filePath);
         if (file) {
             var fileContents = file.read();
-            file.closeFile();
+            file.close();
             return fileContents;
         }
     }
