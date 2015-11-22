@@ -7,24 +7,32 @@ A StormLib MPQ wrapper for Node.js.
 `npm install mech-mpq`
 
 ## Usage
-`var mpq = require('mech-mpq');`
-
 ### Example
 Open an MPQ archive and read a file:
 ```
-try {
-    var archive = mpq.openArchive('./path/to/file.mpq');
-    var file = archive.openFile('filename.txt');
-    var fileContents = file.readFile();
-    file.closeFile();
+var mpq = require('mech-mpq');
 
+function getFileContents(mpqPath, filePath) {
+    var archive = mpq.openArchive(mpqPath);
+    if (archive) {
+        var file = archive.openFile(filePath);
+        if (file) {
+            var fileContents = file.read();
+            file.closeFile();
+            return fileContents;
+        }
+    }
+    return null;
+}
+
+var fileContents = getFileContents('./path/to/archive.mpq', 'filename.txt');
+if (fileContents) {
     console.log(fileContents.length);
     console.log(fileContents);
 }
-catch (err) {
-    console.error(err);
-}
 ```
+
+See the [tests](https://github.com/mechanica/MPQ/tree/master/test) for more examples.
 
 ## Dev
 ### Compilation
