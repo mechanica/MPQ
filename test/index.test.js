@@ -35,6 +35,12 @@ describe('archive operations', function() {
         archive.close();
     });
 
+    it('fails gracefully when opening an invalid archive', function() {
+        var archivePath = getDataPath('invalid_path.mpq');
+        var archive = mpq.openArchive(archivePath);
+        expect(archive).to.not.exist;
+    });
+
     it('can create, remove, and rename files within an archive', function() {
         var archivePath = getDataPath('abc.mpq');
         var filePath_0 = "foo/bar_0.txt";

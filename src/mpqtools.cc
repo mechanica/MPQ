@@ -12,33 +12,25 @@ using v8::Value;
 NAN_METHOD(OpenArchive) {
   if (info.Length() != 1 || !info[0]->IsString()) {
     LOG_ERROR("OpenArchive - incorrect parameters.");
-    return;
+  } else {
+    HANDLE archiveHandle;
+    String::Utf8Value filename(info[0]);
+    if (SFileOpenArchive(*filename, 0, 0x0, &archiveHandle)) {
+      return info.GetReturnValue().Set(MPQArchive::NewInstance(archiveHandle));
+    }
   }
-
-  HANDLE archiveHandle;
-  String::Utf8Value filename(info[0]);
-
-  if (!SFileOpenArchive(*filename, 0, 0x0, &archiveHandle)) {
-    return Nan::ThrowError("Failed to open the archive.");
-  }
-
-  info.GetReturnValue().Set(MPQArchive::NewInstance(archiveHandle));
 }
 
 NAN_METHOD(CreateArchive) {
   if (info.Length() != 1 || !info[0]->IsString()) {
     LOG_ERROR("CreateArchive - incorrect parameters.");
-    return;
+  } else {
+    HANDLE archiveHandle;
+    String::Utf8Value filename(info[0]);
+    if (SFileCreateArchive(*filename, MPQ_CREATE_ARCHIVE_V2, 10, &archiveHandle)) {
+      info.GetReturnValue().Set(MPQArchive::NewInstance(archiveHandle));
+    }
   }
-
-  HANDLE archiveHandle;
-  String::Utf8Value filename(info[0]);
-
-  if (!SFileCreateArchive(*filename, MPQ_CREATE_ARCHIVE_V2, 10, &archiveHandle)) {
-    return Nan::ThrowError("Failed to create the archive.");
-  }
-
-  info.GetReturnValue().Set(MPQArchive::NewInstance(archiveHandle));
 }
 
 NAN_MODULE_INIT(InitAll) {
