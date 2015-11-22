@@ -4,8 +4,8 @@
       "target_name": "mech_mpq",
       "sources": [
         "src/mpqtools.cc",
-        "src/mpqtarchive.cc",
-        "src/mpqtfile.cc"
+        "src/mpqarchive.cc",
+        "src/mpqfile.cc"
       ],
       "link_settings": {
         "libraries": [

@@ -1,7 +1,7 @@
 #include <node.h>
 #include <nan.h>
-#include "mpqtarchive.h"
-#include "mpqtfile.h"
+#include "mpqarchive.h"
+#include "mpqfile.h"
 #include "utils.h"
 
 using v8::FunctionTemplate;
@@ -22,7 +22,7 @@ NAN_METHOD(OpenArchive) {
     return Nan::ThrowError("Failed to open the archive.");
   }
 
-  info.GetReturnValue().Set(MPQTArchive::NewInstance(archiveHandle));
+  info.GetReturnValue().Set(MPQArchive::NewInstance(archiveHandle));
 }
 
 NAN_METHOD(CreateArchive) {
@@ -38,12 +38,12 @@ NAN_METHOD(CreateArchive) {
     return Nan::ThrowError("Failed to create the archive.");
   }
 
-  info.GetReturnValue().Set(MPQTArchive::NewInstance(archiveHandle));
+  info.GetReturnValue().Set(MPQArchive::NewInstance(archiveHandle));
 }
 
 NAN_MODULE_INIT(InitAll) {
-  MPQTArchive::Init();
-  MPQTFile::Init();
+  MPQArchive::Init();
+  MPQFile::Init();
 
   Nan::Set(target, Nan::New("openArchive").ToLocalChecked(),
     Nan::GetFunction(Nan::New<FunctionTemplate>(OpenArchive)).ToLocalChecked());

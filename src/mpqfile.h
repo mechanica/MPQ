@@ -1,18 +1,18 @@
-#ifndef MPQTFILE_H
-#define MPQTFILE_H
+#ifndef MPQFILE_H
+#define MPQFILE_H
 
 #include <node.h>
 #include <nan.h>
 #include "Stormlib/src/StormLib.h"
 
-class MPQTFile : public Nan::ObjectWrap {
+class MPQFile : public Nan::ObjectWrap {
 public:
   static void Init();
   static v8::Local<v8::Value> NewInstance(HANDLE handle);
 
 private:
-  MPQTFile();
-  ~MPQTFile() {}
+  MPQFile();
+  ~MPQFile() {}
 
   static Nan::Persistent<v8::Function> constructor;
   static NAN_METHOD(New);
