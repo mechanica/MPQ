@@ -1,104 +1,96 @@
 #include <node.h>
 #include <node_buffer.h>
 #include "mpqtfile.h"
+#include "utils.h"
 
-using namespace v8;
+using v8::Function;
+using v8::FunctionTemplate;
+using v8::Local;
+using v8::Object;
+using v8::String;
+using v8::Value;
 
-static Local<Object> makeBuffer(char* data, size_t size) {
-  NanEscapableScope();
-
-  Local<Object> buffer = NanNewBufferHandle(data, size);
-  return NanEscapeScope(buffer);
-}
-
-MPQTFile::MPQTFile() {};
-MPQTFile::~MPQTFile() {};
-
-Persistent<Function> MPQTFile::constructor;
+Nan::Persistent<Function> MPQTFile::constructor;
 
 void MPQTFile::Init() {
-  Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(New);
-  tpl->SetClassName(NanNew("MPQTFile"));
+  Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
+
+  tpl->SetClassName(Nan::New("MPQTFile").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  tpl->PrototypeTemplate()->Set(NanNew("getFileSize"), NanNew<FunctionTemplate>(GetFileSize)->GetFunction());
-  tpl->PrototypeTemplate()->Set(NanNew("readFile"), NanNew<FunctionTemplate>(Read)->GetFunction());
-  tpl->PrototypeTemplate()->Set(NanNew("writeFile"), NanNew<FunctionTemplate>(Write)->GetFunction());
-  tpl->PrototypeTemplate()->Set(NanNew("finishFile"), NanNew<FunctionTemplate>(Finish)->GetFunction());
-  tpl->PrototypeTemplate()->Set(NanNew("closeFile"), NanNew<FunctionTemplate>(Close)->GetFunction());
+  Nan::SetPrototypeMethod(tpl, "getSize", GetSize);
+  Nan::SetPrototypeMethod(tpl, "read", Read);
+  Nan::SetPrototypeMethod(tpl, "write", Write);
+  Nan::SetPrototypeMethod(tpl, "finish", Finish);
+  Nan::SetPrototypeMethod(tpl, "close", Close);
 
-  NanAssignPersistent(constructor, tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-NAN_METHOD(MPQTFile::New) {
-  NanScope();
-
-  MPQTFile* obj = new MPQTFile();
-  obj->Wrap(args.This());
-
-  NanReturnValue(args.This());
-}
-
-Handle<Value> MPQTFile::NewInstance(HANDLE hFile) {
-  NanEscapableScope();
-
-  Local<Function> cons = NanNew<Function>(constructor);
+Local<Value> MPQTFile::NewInstance(HANDLE handle) {
+  Local<Function> cons = Nan::New(constructor);
   Local<Object> instance = cons->NewInstance();
 
   MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(instance);
-  obj->hFile = hFile;
+  obj->_handle = handle;
 
-  return NanEscapeScope(instance);
+  return instance;
 }
 
-NAN_METHOD(MPQTFile::GetFileSize) {
-  NanScope();
-  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(args.This());
+MPQTFile::MPQTFile()
+  :_handle(NULL) {
 
-  DWORD filesize = SFileGetFileSize( obj->hFile, NULL );
+}
 
-  NanReturnValue(NanNew<Number>(filesize));
+NAN_METHOD(MPQTFile::New) {
+  MPQTFile* obj = new MPQTFile();
+  obj->Wrap(info.This());
+  info.GetReturnValue().Set(info.This());
+}
+
+NAN_METHOD(MPQTFile::GetSize) {
+  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(info.This());
+  DWORD filesize = SFileGetFileSize(obj->_handle, NULL);
+  info.GetReturnValue().Set(filesize);
 }
 
 NAN_METHOD(MPQTFile::Read) {
-  NanScope();
-  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(args.This());
-
-  DWORD filesize = SFileGetFileSize( obj->hFile, NULL );
+  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(info.This());
+  DWORD filesize = SFileGetFileSize(obj->_handle, NULL);
   unsigned char *buffer = new unsigned char[filesize];
   unsigned int actual = 0;
-
-  SFileReadFile( obj->hFile, buffer, (DWORD)filesize, &actual, NULL );
-
-  NanReturnValue(makeBuffer((char *)buffer, actual));
+  if (SFileReadFile(obj->_handle, buffer, (DWORD)filesize, &actual, NULL) ||
+      // Error code will be returned if less than the request # of bytes are read.
+      // Treat it as a success.
+      GetLastError() == ERROR_HANDLE_EOF) {
+    return info.GetReturnValue().Set(
+      Nan::NewBuffer((char*)buffer, actual).ToLocalChecked());
+  }
 }
 
 NAN_METHOD(MPQTFile::Write) {
-  NanScope();
-  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(args.This());
+  bool result = false;
 
-  DWORD filesize = SFileGetFileSize( obj->hFile, NULL );
-  char *buffer = node::Buffer::Data( args[0]->ToObject() );
+  if (info.Length() != 1 || !info[0]->IsObject()) {
+    LOG_ERROR("MPQTFile::Write - incorrect parameters.");
+  } else {
+    MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(info.This());
+    DWORD filesize = SFileGetFileSize(obj->_handle, NULL);
+    char *buffer = node::Buffer::Data(info[0]->ToObject());
+    result = SFileWriteFile(obj->_handle, buffer, (DWORD)filesize, 0x0);
+  }
 
-  SFileWriteFile( obj->hFile, buffer, (DWORD)filesize, 0x0 );
-
-  NanReturnValue(args.This());
+  return info.GetReturnValue().Set(result);
 }
 
 NAN_METHOD(MPQTFile::Finish) {
-  NanScope();
-  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(args.This());
-
-  SFileFinishFile( obj->hFile );
-
-  NanReturnValue(args.This());
+  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(info.This());
+  bool result = SFileFinishFile(obj->_handle);
+  return info.GetReturnValue().Set(result);
 }
 
 NAN_METHOD(MPQTFile::Close) {
-  NanScope();
-  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(args.This());
-
-  SFileCloseFile( obj->hFile );
-
-  NanReturnValue(NanNew<Boolean>(TRUE));
+  MPQTFile* obj = ObjectWrap::Unwrap<MPQTFile>(info.This());
+  bool result = SFileCloseFile(obj->_handle);
+  return info.GetReturnValue().Set(result);
 }

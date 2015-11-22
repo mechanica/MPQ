@@ -2,28 +2,27 @@
 #define MPQTFILE_H
 
 #include <node.h>
-#include <node_object_wrap.h>
 #include <nan.h>
 #include "Stormlib/src/StormLib.h"
 
-class MPQTFile : public node::ObjectWrap {
- public:
+class MPQTFile : public Nan::ObjectWrap {
+public:
   static void Init();
-  static v8::Handle<v8::Value> NewInstance(HANDLE hFile);
+  static v8::Local<v8::Value> NewInstance(HANDLE handle);
 
- private:
+private:
   MPQTFile();
-  ~MPQTFile();
+  ~MPQTFile() {}
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   static NAN_METHOD(New);
-  static NAN_METHOD(GetFileSize);
+  static NAN_METHOD(GetSize);
   static NAN_METHOD(Read);
   static NAN_METHOD(Write);
   static NAN_METHOD(Finish);
   static NAN_METHOD(Close);
 
-  HANDLE hFile;
+  HANDLE _handle;
 };
 
 #endif

@@ -5,26 +5,26 @@
 #include <nan.h>
 #include "Stormlib/src/StormLib.h"
 
-class MPQTArchive : public node::ObjectWrap {
- public:
+class MPQTArchive : public Nan::ObjectWrap {
+public:
   static void Init();
-  static v8::Handle<v8::Value> NewInstance(HANDLE hArchive);
+  static v8::Local<v8::Value> NewInstance(HANDLE handle);
 
- private:
+private:
   MPQTArchive();
-  ~MPQTArchive();
+  ~MPQTArchive() {}
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   static NAN_METHOD(New);
-  static NAN_METHOD(Open);
+  static NAN_METHOD(OpenFile);
   static NAN_METHOD(HasFile);
-  static NAN_METHOD(EnumLocales);
-  static NAN_METHOD(Create);
-  static NAN_METHOD(Remove);
-  static NAN_METHOD(Rename);
+  static NAN_METHOD(CreateFile);
+  static NAN_METHOD(RemoveFile);
+  static NAN_METHOD(RenameFile);
   static NAN_METHOD(Flush);
   static NAN_METHOD(Close);
-  HANDLE hArchive;
+
+  HANDLE _handle;
 };
 
 #endif
