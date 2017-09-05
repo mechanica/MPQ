@@ -33,7 +33,7 @@
     "nan": "^2.1.0"
   },
   "engines": {
-    "node": "4.x"
+    "node": ">= 4.x"
   },
   "devDependencies": {
     "buffer-equal": "0.0.1",
